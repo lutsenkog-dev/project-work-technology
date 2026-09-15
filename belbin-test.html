@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест Белбіна — Командні ролі</title>
+<style>
+  :root {
+    --primary: #1a5276;
+    --primary-light: #2e86c1;
+    --accent: #e67e22;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --muted: #7f8c8d;
+    --border: #d5d8dc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    padding: 24px 32px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+  header p { font-size: 0.95rem; opacity: 0.9; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+
+  /* Instruction */
+  .instruction-card {
+    background: var(--card);
+    border-left: 5px solid var(--accent);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .instruction-card h2 { font-size: 1rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .instruction-card p { font-size: 0.92rem; line-height: 1.7; color: var(--text); }
+  .instruction-card ul { padding-left: 20px; margin-top: 8px; }
+  .instruction-card ul li { font-size: 0.92rem; line-height: 1.7; }
+
+  /* Name field */
+  .name-row {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 16px 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .name-row label { font-weight: 600; white-space: nowrap; }
+  .name-row input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .name-row input:focus { border-color: var(--primary-light); }
+
+  /* Progress */
+  .progress-bar-wrap {
+    background: #dde1e7;
+    border-radius: 20px;
+    height: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-light), var(--accent));
+    border-radius: 20px;
+    transition: width 0.4s ease;
+  }
+  .progress-label { text-align: right; font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; }
+
+  /* Block card */
+  .block-card {
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+    margin-bottom: 28px;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+  }
+  .block-header {
+    background: var(--primary);
+    color: white;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .block-header h2 { font-size: 1rem; font-weight: 700; }
+  .block-sum {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+  .block-sum .sum-val {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 36px;
+    text-align: center;
+  }
+  .block-sum .sum-val.ok { background: rgba(39,174,96,0.5); }
+  .block-sum .sum-val.error { background: rgba(231,76,60,0.7); }
+
+  .block-body { padding: 0; }
+
+  .question-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .question-row:last-child { border-bottom: none; }
+  .question-row:hover { background: #f0f4f8; }
+
+  .q-number {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+    min-width: 28px;
+    text-align: center;
+    background: var(--bg);
+    border-radius: 4px;
+    padding: 3px 5px;
+  }
+  .q-text {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .score-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-score {
+    width: 30px; height: 30px;
+    border: none;
+    background: var(--bg);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--primary);
+    font-weight: 700;
+    transition: background 0.15s, color 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-score:hover { background: var(--primary); color: white; }
+  .score-display {
+    width: 44px;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 0;
+    background: white;
+    cursor: default;
+  }
+  .score-display.positive { color: var(--success); border-color: var(--success); }
+
+  /* Помилка суми */
+  .block-error-msg {
+    display: none;
+    color: var(--danger);
+    font-size: 0.82rem;
+    padding: 6px 20px 10px;
+    font-weight: 600;
+  }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 8px 0 32px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 2px 6px rgba(26,82,118,0.3);
+  }
+  .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); }
+  .btn-secondary {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-danger {
+    background: white;
+    color: var(--danger);
+    border: 2px solid var(--danger);
+  }
+  .btn-danger:hover { background: #fdf2f0; }
+
+  /* Results */
+  #results-section { display: none; }
+  .results-card {
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .results-card h2 {
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+  }
+  .result-student { font-size: 1rem; color: var(--muted); margin-bottom: 16px; }
+
+  .role-bars { display: flex; flex-direction: column; gap: 12px; }
+  .role-row { display: flex; align-items: center; gap: 12px; }
+  .role-name {
+    width: 130px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: right;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .role-bar-bg {
+    flex: 1;
+    background: #e8edf2;
+    border-radius: 20px;
+    height: 22px;
+    overflow: hidden;
+  }
+  .role-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: white;
+    transition: width 0.6s ease;
+    white-space: nowrap;
+    min-width: 30px;
+  }
+  .role-score-label {
+    width: 50px;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .top-roles {
+    margin-top: 24px;
+    padding: 16px;
+    background: #eaf4fb;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-light);
+  }
+  .top-roles h3 { font-size: 0.95rem; color: var(--primary); margin-bottom: 10px; }
+  .top-role-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 0.9rem;
+  }
+  .role-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .role-descriptions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .role-desc-item {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .role-desc-header {
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .role-desc-body {
+    display: none;
+    padding: 12px 16px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text);
+    background: #fafbfc;
+    border-top: 1px solid var(--border);
+  }
+  .role-desc-item.open .role-desc-body { display: block; }
+  .role-desc-header .toggle-icon { margin-left: auto; color: var(--muted); font-size: 0.8rem; }
+
+  /* Print / export hint */
+  .hint {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  @media print {
+    header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .btn, .actions, .btn-score, .score-input-wrap { display: none !important; }
+    #results-section { display: block !important; }
+    #survey-section { display: none !important; }
+  }
+
+  @media (max-width: 600px) {
+    .block-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .question-row { flex-wrap: wrap; }
+    .q-text { flex-basis: 100%; }
+    .role-name { width: 100px; font-size: 0.8rem; }
+    .name-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧩 Тест Белбіна: Командні ролі</h1>
+  <p>Визначення ролей у команді за методикою Мередіта Белбіна</p>
+</header>
+
+<div class="container">
+
+  <!-- Survey Section -->
+  <div id="survey-section">
+
+    <div class="instruction-card">
+      <h2>📋 Інструкція</h2>
+      <p>Тест складається з <strong>7 блоків</strong> по <strong>8 тверджень</strong> у кожному. На кожен блок у вас є <strong>10 балів</strong>, які ви розподіляєте між твердженнями:</p>
+      <ul>
+        <li>Можна оцінити <strong>3–4 твердження</strong> в блоці (не більше).</li>
+        <li>Якщо ви повністю погоджуєтесь із твердженням — можна дати йому <strong>всі 10 балів</strong>.</li>
+        <li>Мінімальна оцінка одного твердження — <strong>2 бали</strong>.</li>
+        <li>Сума балів у кожному блоці <strong>не повинна перевищувати 10</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="name-row">
+      <label for="studentName">👤 Ваше ім'я:</label>
+      <input type="text" id="studentName" placeholder="Введіть прізвище та ім'я…" />
+    </div>
+
+    <div class="progress-label" id="progressLabel">Заповнено блоків: 0 / 7</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- Blocks will be injected here -->
+    <div id="blocks-container"></div>
+
+    <div class="actions">
+      <button class="btn btn-danger" onclick="resetAll()">↺ Скинути все</button>
+      <button class="btn btn-primary" onclick="calculate()">📊 Розрахувати результати</button>
+    </div>
+
+  </div>
+
+  <!-- Results Section -->
+  <div id="results-section">
+    <div class="results-card">
+      <h2>📊 Результати тесту Белбіна</h2>
+      <div class="result-student" id="resultStudent"></div>
+
+      <div class="role-bars" id="roleBars"></div>
+
+      <div class="top-roles" id="topRoles"></div>
+    </div>
+
+    <div class="results-card">
+      <h2>📖 Опис ролей</h2>
+      <div class="role-descriptions" id="roleDescriptions"></div>
+    </div>
+
+    <div class="hint">Щоб зберегти результати — скористайтесь друком (Ctrl+P) або зробіть скриншот</div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="backToSurvey()">← Повернутись до тесту</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Роздрукувати</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+
+const blocks = [
+  {
+    id: 1,
+    title: "БЛОК 1. ЩО Я МОЖУ ЗАПРОПОНУВАТИ КОМАНДІ?",
+    questions: [
+      { id: "q10", label: "10", text: "Я думаю, що в змозі швидко сприймати та використовувати нові можливості" },
+      { id: "q11", label: "11", text: "Я легко кооперуюсь з людьми різних типів" },
+      { id: "q12", label: "12", text: "Мій головний актив – продукувати нові ідеї" },
+      { id: "q13", label: "13", text: "Я здатен залучати людей, які, на мою думку, можуть зробити великий вклад в досягнення командних цілей" },
+      { id: "q14", label: "14", text: "Моя особиста здібність – ефективно доводити справу до кінця" },
+      { id: "q15", label: "15", text: "Я не уявляю собі тимчасового зниження своєї популярності, навіть якщо це приведе до збільшення вигоди" },
+      { id: "q16", label: "16", text: "Зазвичай я відчуваю, що реалістичне і що дієздатне" },
+      { id: "q17", label: "17", text: "Я здатен запропонувати вагомі аргументи на користь іншої лінії дій, не провокуючи при цьому упередженого ставлення" },
+    ]
+  },
+  {
+    id: 2,
+    title: "БЛОК 2. ЩО ХАРАКТЕРИЗУЄ МЕНЕ ЯК ЧЛЕНА КОМАНДИ?",
+    questions: [
+      { id: "q20", label: "20", text: "Я почуваю себе некомфортно на зборах та нарадах, навіть якщо вони чітко структуровані і продумано організовані" },
+      { id: "q21", label: "21", text: "Я схильний покладатися на людей, які добре вміють аргументувати свою точку зору ще до того, коли вона була всебічно обговорена" },
+      { id: "q22", label: "22", text: "Коли група дискутує з приводу нових ідей, я можу занадто багато говорити" },
+      { id: "q23", label: "23", text: "Моє особисте ставлення / відносини заважають мені підтримувати колег з ентузіазмом" },
+      { id: "q24", label: "24", text: "Коли потрібно зробити будь-яку справу, деякі люди вважають, що я дію агресивно і авторитарно" },
+      { id: "q25", label: "25", text: "Я вагаюсь брати на себе лідерську роль, можливо тому, що занадто чуттєвий до почуттів та настроїв групи" },
+      { id: "q26", label: "26", text: "У мене є схильність настільки захоплюватися власними справами, що я забуваю про те, що відбувається довкола" },
+      { id: "q27", label: "27", text: "Мої колеги вважають, що я надмірно переймаюсь незначними деталями та боюсь ризику, що справа буде зроблена марно" },
+    ]
+  },
+  {
+    id: 3,
+    title: "БЛОК 3. КОЛИ Я ПРАЦЮЮ З ІНШИМИ НАД ПРОЕКТОМ",
+    questions: [
+      { id: "q30", label: "30", text: "Я можу добре впливати на інших людей, при цьому не здійснюючи сильного тиску" },
+      { id: "q31", label: "31", text: "Моє «шосте чуття» підказує і застерігає мене від помилок та інцидентів, які інколи трапляються через неуважність" },
+      { id: "q32", label: "32", text: "В ім'я досягнення головних цілей, я готовий прискорювати події, не витрачаючи часу на обговорення" },
+      { id: "q33", label: "33", text: "Від мене завжди можна чекати чогось оригінального" },
+      { id: "q34", label: "34", text: "Я завжди готовий підтримати хорошу пропозицію, яка принесе вигоду всім" },
+      { id: "q35", label: "35", text: "Я постійно відслідковую останні ідеї та новітні досягнення" },
+      { id: "q36", label: "36", text: "Я думаю, що мої здібності до суджень та оцінок можуть бути значним внеском у прийняття правильних рішень" },
+      { id: "q37", label: "37", text: "На мене завжди можна покластися на завершальному етапі роботи" },
+    ]
+  },
+  {
+    id: 4,
+    title: "БЛОК 4. МОЄ СТАВЛЕННЯ ТА ІНТЕРЕС ДО ГРУПОВОЇ РОБОТИ",
+    questions: [
+      { id: "q40", label: "40", text: "Я щиро бажаю знати своїх колег краще" },
+      { id: "q41", label: "41", text: "Я не боюся ні оскаржувати точку зору іншої людини, ні залишитися в меншості" },
+      { id: "q42", label: "42", text: "Зазвичай, я можу довести неконкурентоспроможність невдалої пропозиції" },
+      { id: "q43", label: "43", text: "Я вважаю, що я здатен добре виконати будь-яку функцію заради виконання спільного блага" },
+      { id: "q44", label: "44", text: "Часто я уникаю очевидних рішень і приходжу замість цього до несподіваного вирішення проблеми" },
+      { id: "q45", label: "45", text: "Все, що я роблю, я прагну доводити до досконалості" },
+      { id: "q46", label: "46", text: "Я готовий використовувати контакти та зв'язки поза групою" },
+      { id: "q47", label: "47", text: "Я не відчуваю труднощів у прийнятті рішень, хоча я завжди відкритий різним точкам зору" },
+    ]
+  },
+  {
+    id: 5,
+    title: "БЛОК 5. Я ОДЕРЖУЮ ЗАДОВОЛЕННЯ ВІД РОБОТИ, ТОМУ ЩО…",
+    questions: [
+      { id: "q50", label: "50", text: "Мені подобається аналізувати ситуації та оцінювати можливі напрями діяльності" },
+      { id: "q51", label: "51", text: "Мені цікаво знаходити практичні шляхи вирішення проблеми" },
+      { id: "q52", label: "52", text: "Мені приємно відчувати, що я допомагаю створенню хороших відносин на роботі" },
+      { id: "q53", label: "53", text: "Часто маю сильний вплив на рішення, що приймається" },
+      { id: "q54", label: "54", text: "Я маю відкриті, привітні відносини з людьми, які можуть запропонувати щось нове" },
+      { id: "q55", label: "55", text: "Я можу переконувати людей в необхідності певної лінії дій" },
+      { id: "q56", label: "56", text: "Я почуваю себе добре вдома, коли я можу приділити максимум уваги завданню" },
+      { id: "q57", label: "57", text: "Я люблю працювати з будь-чим, що стимулює мою уяву" },
+    ]
+  },
+  {
+    id: 6,
+    title: "БЛОК 6. КОЛИ ЗАВДАННЯ СКЛАДНЕ ТА НЕЗНАЙОМЕ",
+    questions: [
+      { id: "q60", label: "60", text: "Я відкладаю справу на певний час та розмірковую над проблемою" },
+      { id: "q61", label: "61", text: "Я готовий співпрацювати з людьми, які більш позитивно і з більшим ентузіазмом відносяться до проблеми" },
+      { id: "q62", label: "62", text: "Я намагаюсь зробити завдання простішим, підшукуючи в групі людей, які можуть взяти на себе вирішення частини проблеми" },
+      { id: "q63", label: "63", text: "Моє вроджене почуття часу дозволяє мені витримувати терміни виконання завдання" },
+      { id: "q64", label: "64", text: "Я вважаю, мені вдається зберегти ясність думки і спокій" },
+      { id: "q65", label: "65", text: "Навіть під тиском зовнішніх обставин, я не відступлю від мети" },
+      { id: "q66", label: "66", text: "Якщо я відчуваю, що група не прогресує, я готовий взяти лідерські обов'язки на себе" },
+      { id: "q67", label: "67", text: "Я б розпочав дискусію з метою стимулювання появи нових думок, які сприяли б вирішенню проблеми" },
+    ]
+  },
+  {
+    id: 7,
+    title: "БЛОК 7. ПРОБЛЕМИ, ЩО ВИНИКАЮТЬ ПРИ РОБОТІ В ГРУПАХ",
+    questions: [
+      { id: "q70", label: "70", text: "Я схильний висловлювати свою нетерпимість по відношенню до людей, які стоять на шляху розвитку прогресу" },
+      { id: "q71", label: "71", text: "Інші можуть критикувати мене за те, що я занадто аналітичний і не підключаю інтуїцію" },
+      { id: "q72", label: "72", text: "Моє бажання впевнитися в тому, що робота виконується з високим якісним рівнем, може інколи приводити до затримки" },
+      { id: "q73", label: "73", text: "Мені швидко все набридає, і я покладаюсь на те, що хтось із групи стимулює мій інтерес" },
+      { id: "q74", label: "74", text: "Мені важко приступити до вирішення завдання, не маючи чіткої цілі" },
+      { id: "q75", label: "75", text: "Інколи мені важко пояснити та описати проблему в комплексі" },
+      { id: "q76", label: "76", text: "Я знаю, що вимагаю від інших того, що сам не можу виконати" },
+      { id: "q77", label: "77", text: "Я вагаюсь висловлювати власну думку, коли я знаходжусь в очевидній опозиції до більшості" },
+    ]
+  }
+];
+
+// Scoring keys (from xlsx formulas)
+// Реалізатор: q16+q20+q37+q42+q51+q64+q74  (cells C9,C13,C30,C35,C44,C57,C67 → rows 9,13,30,35,44,57,67 → questions 16,20,37,42,51,64,74)
+// Координатор: q13+q21+q30+q47+q55+q62+q76
+// Творець: q15+q24+q32+q41+q53+q66+q70
+// Генератор ідей: q12+q26+q33+q44+q57+q60+q75
+// Дослідник: q10+q22+q35+q46+q54+q67+q73
+// Експерт: q17+q23+q36+q42+q50+q64+q71
+// Дипломат: q11+q25+q34+q40+q52+q61+q77
+// Фахівець: q14+q27+q31+q45+q56+q63+q72
+
+const roles = [
+  {
+    id: "realiz",
+    name: "Реалізатор",
+    color: "#1a5276",
+    keys: ["q16","q20","q37","q42","q51","q64","q74"],
+    desc: "Реалізатор — це дисциплінована, надійна та ефективна людина, яка перетворює ідеї на практичні дії. Вона консервативна, добре організована, вміє систематично і методично виконувати завдання. Основна цінність для команди — надійність і здатність доводити роботу до кінця. Може бути негнучким і повільно реагувати на нові можливості.",
+  },
+  {
+    id: "coord",
+    name: "Координатор",
+    color: "#117a65",
+    keys: ["q13","q21","q30","q47","q55","q62","q76"],
+    desc: "Координатор — зрілий, впевнений у собі лідер, який добре делегує завдання. Чітко формулює цілі, вміє слухати інших і розкривати таланти членів команди. Не обов'язково є найінтелектуальнішим у команді, але вміло об'єднує людей навколо спільної мети. Може здаватися дещо маніпулятивним.",
+  },
+  {
+    id: "creator",
+    name: "Творець",
+    color: "#922b21",
+    keys: ["q15","q24","q32","q41","q53","q66","q70"],
+    desc: "Творець (Shapers) — динамічний і цілеспрямований. Кидає виклик команді, тисне на неї, щоб підвищити ефективність. Сміливий, наполегливий та рішучий. Здатний долати перешкоди. Може бути провокаційним і дратувати інших своєю нетерплячістю.",
+  },
+  {
+    id: "genid",
+    name: "Генератор ідей",
+    color: "#7d3c98",
+    keys: ["q12","q26","q33","q44","q57","q60","q75"],
+    desc: "Генератор ідей — творча, нестандартно мисляча людина. Пропонує нові підходи та оригінальні рішення складних проблем. Часто є інтровертом, може ігнорувати практичні деталі й занадто захоплюватися власними ідеями, що ускладнює взаємодію з командою.",
+  },
+  {
+    id: "resear",
+    name: "Дослідник",
+    color: "#1f618d",
+    keys: ["q10","q22","q35","q46","q54","q67","q73"],
+    desc: "Дослідник ресурсів — ентузіаст-екстраверт, комунікабельний і відкритий. Досліджує можливості, розвиває контакти, знаходить ресурси поза командою. Швидко захоплюється новим, але може втрачати інтерес після початкового ентузіазму. Дуже корисний для нетворкінгу.",
+  },
+  {
+    id: "expert",
+    name: "Експерт",
+    color: "#145a32",
+    keys: ["q17","q23","q36","q42","q50","q64","q71"],
+    desc: "Експерт (Monitor Evaluator) — тверезомислячий стратег, здатний аналізувати всі варіанти й ухвалювати виважені рішення. Об'єктивний і точний у судженнях. Може бути надмірно критичним і нездатним надихати інших. Рідко помиляється при прийнятті ключових рішень.",
+  },
+  {
+    id: "diplom",
+    name: "Дипломат",
+    color: "#b7950b",
+    keys: ["q11","q25","q34","q40","q52","q61","q77"],
+    desc: "Дипломат (Team Worker) — кооперативний, тактовний і чуйний. Слухає, будує команду, запобігає конфліктам та зміцнює моральний дух. Незамінний у складних міжособистісних ситуаціях. Може бути нерішучим у критичні моменти і надмірно уникати протистоянь.",
+  },
+  {
+    id: "spec",
+    name: "Фахівець",
+    color: "#784212",
+    keys: ["q14","q27","q31","q45","q56","q63","q72"],
+    desc: "Фахівець — самостійний, цілеспрямований профі з глибокими знаннями у вузькій сфері. Пишається своїм досвідом, постійно поглиблює знання. Може не бачити «великої картини» і надмірно захоплюватися технічними деталями за рахунок більш широких командних цілей.",
+  }
+];
+
+// ─── SCORES STATE ──────────────────────────────────────────────────────────
+
+const scores = {};
+blocks.forEach(b => b.questions.forEach(q => { scores[q.id] = 0; }));
+
+// ─── BUILD UI ──────────────────────────────────────────────────────────────
+
+function buildSurvey() {
+  const container = document.getElementById('blocks-container');
+  blocks.forEach(block => {
+    const card = document.createElement('div');
+    card.className = 'block-card';
+    card.id = `block-${block.id}`;
+
+    card.innerHTML = `
+      <div class="block-header">
+        <h2>${block.title}</h2>
+        <div class="block-sum">
+          Тверджень: <span class="sum-val" id="count-${block.id}">0</span> / 4 &nbsp;|&nbsp;
+          Сума: <span class="sum-val" id="sum-${block.id}">0</span> / 10
+        </div>
+      </div>
+      <div class="block-body" id="body-${block.id}"></div>
+      <div class="block-error-msg" id="err-${block.id}">⚠️ Сума перевищує 10 балів!</div>
+    `;
+
+    const body = card.querySelector(`#body-${block.id}`);
+    block.questions.forEach(q => {
+      const row = document.createElement('div');
+      row.className = 'question-row';
+      row.innerHTML = `
+        <span class="q-number">${q.label}</span>
+        <span class="q-text">${q.text}</span>
+        <div class="score-input-wrap">
+          <button class="btn-score" onclick="adjustScore('${q.id}', ${block.id}, -1)" title="Зменшити">−</button>
+          <div class="score-display" id="disp-${q.id}">0</div>
+          <button class="btn-score" onclick="adjustScore('${q.id}', ${block.id}, +1)" title="Збільшити">+</button>
+        </div>
+      `;
+      body.appendChild(row);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function getBlockQuestions(blockId) {
+  return blocks.find(b => b.id === blockId).questions;
+}
+
+function getBlockSum(blockId) {
+  return getBlockQuestions(blockId).reduce((s, q) => s + scores[q.id], 0);
+}
+
+function getBlockScoredCount(blockId) {
+  return getBlockQuestions(blockId).filter(q => scores[q.id] > 0).length;
+}
+
+function adjustScore(qId, blockId, delta) {
+  const current = scores[qId];
+  const newVal = current + delta;
+  if (newVal < 0) return;
+
+  // Check max 4 scored questions per block
+  if (delta > 0 && current === 0 && getBlockScoredCount(blockId) >= 4) {
+    showBlockError(blockId, true, 'count');
+    return;
+  }
+
+  // Check if would exceed block max of 10
+  const blockSum = getBlockSum(blockId);
+  if (delta > 0 && blockSum >= 10) {
+    showBlockError(blockId, true, 'sum');
+    return;
+  }
+  if (delta > 0 && newVal > 10) return;
+
+  scores[qId] = newVal;
+  updateDisplay(qId, blockId);
+}
+
+function updateDisplay(qId, blockId) {
+  const disp = document.getElementById(`disp-${qId}`);
+  disp.textContent = scores[qId];
+  disp.className = 'score-display' + (scores[qId] > 0 ? ' positive' : '');
+
+  const sum = getBlockSum(blockId);
+  const count = getBlockScoredCount(blockId);
+
+  const sumEl = document.getElementById(`sum-${blockId}`);
+  sumEl.textContent = sum;
+  sumEl.className = 'sum-val' + (sum > 10 ? ' error' : (sum > 0 ? ' ok' : ''));
+
+  const countEl = document.getElementById(`count-${blockId}`);
+  if (countEl) {
+    countEl.textContent = count;
+    countEl.className = 'sum-val' + (count > 4 ? ' error' : (count > 0 ? ' ok' : ''));
+  }
+
+  if (sum > 10) showBlockError(blockId, true, 'sum');
+  else if (count > 4) showBlockError(blockId, true, 'count');
+  else showBlockError(blockId, false);
+
+  updateProgress();
+}
+
+function showBlockError(blockId, show, type) {
+  const errEl = document.getElementById(`err-${blockId}`);
+  if (!errEl) return;
+  if (!show) { errEl.style.display = 'none'; return; }
+  errEl.style.display = 'block';
+  errEl.textContent = type === 'count'
+    ? '⚠️ Можна оцінювати не більше 4 тверджень у блоці!'
+    : '⚠️ Сума перевищує 10 балів!';
+}
+
+function updateProgress() {
+  const filled = blocks.filter(b => getBlockSum(b.id) > 0).length;
+  document.getElementById('progressLabel').textContent = `Заповнено блоків: ${filled} / 7`;
+  document.getElementById('progressFill').style.width = `${(filled / 7) * 100}%`;
+}
+
+// ─── CALCULATE ─────────────────────────────────────────────────────────────
+
+function calculate() {
+  // Validate
+  let hasError = false;
+  for (const block of blocks) {
+    const sum = getBlockSum(block.id);
+    if (sum > 10) {
+      showBlockError(block.id, true);
+      hasError = true;
+    }
+  }
+  if (hasError) {
+    alert('Будь ласка, виправте помилки: сума балів у деяких блоках перевищує 10.');
+    return;
+  }
+
+  // Compute role scores
+  const roleScores = {};
+  roles.forEach(role => {
+    roleScores[role.id] = role.keys.reduce((s, k) => s + scores[k], 0);
+  });
+
+  const maxScore = Math.max(...Object.values(roleScores));
+
+  // Show results
+  document.getElementById('survey-section').style.display = 'none';
+  const rs = document.getElementById('results-section');
+  rs.style.display = 'block';
+
+  const studentName = document.getElementById('studentName').value.trim() || 'Студент';
+  document.getElementById('resultStudent').textContent = `Студент: ${studentName}`;
+
+  // Bars
+  const barsEl = document.getElementById('roleBars');
+  barsEl.innerHTML = '';
+  const sorted = [...roles].sort((a,b) => roleScores[b.id] - roleScores[a.id]);
+  sorted.forEach(role => {
+    const val = roleScores[role.id];
+    const pct = maxScore > 0 ? Math.round((val / maxScore) * 100) : 0;
+    const row = document.createElement('div');
+    row.className = 'role-row';
+    row.innerHTML = `
+      <div class="role-name">${role.name}</div>
+      <div class="role-bar-bg">
+        <div class="role-bar-fill" style="width:${pct}%; background:${role.color};">
+          ${pct > 20 ? role.name : ''}
+        </div>
+      </div>
+      <div class="role-score-label">${val} б.</div>
+    `;
+    barsEl.appendChild(row);
+  });
+
+  // Top roles
+  const topRolesEl = document.getElementById('topRoles');
+  const top3 = sorted.slice(0, 3).filter(r => roleScores[r.id] > 0);
+  topRolesEl.innerHTML = `<h3>🏆 Провідні ролі</h3>` + top3.map((r, i) => `
+    <div class="top-role-item">
+      <span>${i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
+      <span class="role-badge" style="background:${r.color}">${r.name}</span>
+      <span>${roleScores[r.id]} балів</span>
+      ${i === 0 ? '<span style="color:#888;font-size:0.82rem;">— основна роль</span>' : ''}
+    </div>
+  `).join('');
+
+  // Descriptions
+  const descEl = document.getElementById('roleDescriptions');
+  descEl.innerHTML = '';
+  sorted.forEach(role => {
+    const item = document.createElement('div');
+    item.className = 'role-desc-item';
+    item.innerHTML = `
+      <div class="role-desc-header" onclick="toggleDesc(this)" style="border-left: 4px solid ${role.color}">
+        <span class="role-badge" style="background:${role.color}">${role.name}</span>
+        <span style="margin-left:6px;color:#555;font-weight:normal;">${roleScores[role.id]} балів</span>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="role-desc-body">${role.desc}</div>
+    `;
+    descEl.appendChild(item);
+  });
+
+  rs.scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleDesc(header) {
+  const item = header.closest('.role-desc-item');
+  item.classList.toggle('open');
+  header.querySelector('.toggle-icon').textContent = item.classList.contains('open') ? '▲' : '▼';
+}
+
+function backToSurvey() {
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('survey-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetAll() {
+  if (!confirm('Скинути всі відповіді?')) return;
+  Object.keys(scores).forEach(k => { scores[k] = 0; });
+  blocks.forEach(b => {
+    b.questions.forEach(q => {
+      const disp = document.getElementById(`disp-${q.id}`);
+      if (disp) { disp.textContent = '0'; disp.className = 'score-display'; }
+    });
+    const sumEl = document.getElementById(`sum-${b.id}`);
+    if (sumEl) { sumEl.textContent = '0'; sumEl.className = 'sum-val'; }
+    const countEl = document.getElementById(`count-${b.id}`);
+    if (countEl) { countEl.textContent = '0'; countEl.className = 'sum-val'; }
+    showBlockError(b.id, false);
+  });
+  updateProgress();
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+buildSurvey();
+</script>
+</body>
+</html>
